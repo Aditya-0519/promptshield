@@ -35,15 +35,27 @@ async function main() {
 
   console.log(`Checking ${url} ...`);
 
+    const timeoutMs = Number(process.env.CHECK_TIMEOUT_MS) || 180000;
+  console.log(`(this can take up to ${Math.round(timeoutMs / 1000)} s if Gemini is slow)`);
+
   let res;
   try {
     res = await fetch(url, {
       method: 'POST',
       headers: config.headers || { 'Content-Type': 'application/json' },
       body,
-      signal: AbortSignal.timeout(60000),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (err) {
+    if (err.name === 'TimeoutError') {
+      done(false, [
+        `NOT READY: the server is running but did not answer within ${Math.round(timeoutMs / 1000)} s.`,
+        'It is almost certainly waiting on Gemini (a hung connection that is being retried).',
+        'Look at the backend terminal for "GEMINI DEBUG ERROR" lines.',
+        'Then run:  node scripts/net-test.js   to test your connection to Google.',
+        ...warnings,
+      ]);
+    }
     const why = (err.cause && err.cause.code) || err.message;
     done(false, [
       `NOT READY: cannot reach ${url} (${why}).`,

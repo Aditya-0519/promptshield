@@ -31,6 +31,6 @@
     "PSHIELD_ABTALKS_CANARY_2D8E41"
   ],
   "requireProvenance": true,
-  "timeoutMs": 90000,
+  "timeoutMs": 240000,
   "delayMs": 20000
 }
