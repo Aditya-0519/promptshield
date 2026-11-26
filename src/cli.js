@@ -35,6 +35,7 @@ Usage:
   promptshield scan [options]
 
 Options:
+  --strict             Exit 3 if any attack was inconclusive (recommended for CI)
   --config <file>      Target config (default: promptshield.config.json)
   --category <list>    Comma-separated: system_prompt_leak,prompt_injection,data_leak
   --out <dir>          Report folder (default: reports)
@@ -67,7 +68,7 @@ async function main() {
     judge: makeJudge({ useLlm: useLlm && !!process.env.GEMINI_API_KEY }),
     onResult: (r) => {
       const tag =
-        r.verdict === 'vulnerable' ? C.red('VULNERABLE') : r.verdict === 'safe' ? C.green('safe      ') : C.yellow('error     ');
+        r.verdict === 'vulnerable' ? C.red('VULNERABLE') : r.verdict === 'safe' ? C.green('safe      ') : r.verdict === 'inconclusive' ? C.yellow('INCONCLUSIVE') : C.yellow('error     ');
       console.log(`${tag} ${r.attack.id} ${r.attack.name} ${C.dim(`[${r.attack.severity}]`)}`);
       if (r.verdict !== 'safe') console.log(C.dim(`           ${r.reason}`));
     },
@@ -86,16 +87,23 @@ async function main() {
     path.join(outDir, 'report.json'),
     JSON.stringify({ meta, summary: s, results: results.map((r) => ({
       id: r.attack.id, name: r.attack.name, category: r.attack.category, severity: r.attack.severity,
-      verdict: r.verdict, reason: r.reason, prompt: r.attack.prompt, response: r.response.text,
+      verdict: r.verdict, cause: r.cause, reason: r.reason,
+      provenance: r.response.provenance ? r.response.provenance.source : undefined,
+      provenanceVerified: r.provenanceVerified,
+      prompt: r.attack.prompt, response: r.response.text,
     })) }, null, 2)
   );
 
   console.log(
-    `\n${C.bold('Result:')} ${s.vulnerable} vulnerable, ${s.safe} safe, ${s.errors} errors  ` +
-      `(${s.score}% of attacks resisted)`
+    `\n${C.bold('Result:')} ${s.vulnerable} vulnerable, ${s.safe} safe, ${s.inconclusive} inconclusive, ${s.errors} errors  ` +
+      `(${s.score === null ? 'n/a' : s.score + '%'} of conclusive attacks resisted)`
   );
+  if (s.inconclusive > 0) {
+    console.log(C.yellow(`${s.inconclusive} attack(s) were inconclusive and are NOT confirmed safe.`));
+  }
   console.log(`Report: ${path.join(outDir, 'report.html')}\n`);
-  process.exit(s.vulnerable > 0 ? 1 : 0);
+    if (s.vulnerable > 0) process.exit(1);
+  if (args.strict && s.inconclusive > 0) process.exit(3);
+  process.exit(0);
 }
-
 main().catch((err) => { console.error(C.red(err.stack || err.message)); process.exit(2); });

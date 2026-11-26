@@ -39,6 +39,22 @@ Edit `promptshield.config.json`:
 
 Only scan apps you own or have written permission to test.
 
+## Provenance and INCONCLUSIVE results
+
+A scan is only trustworthy if the target really called a live model. Targets can report this with an
+`X-AI-Provenance: live | mock | fallback | none` header or a `provenance.source` body field
+(ABTalks does this when `EXPOSE_AI_PROVENANCE=true`). Optional config:
+
+| Field | Meaning |
+|---|---|
+| `requireProvenance` | `true`: a response with no provenance is INCONCLUSIVE (recommended for LLM targets) |
+| `provenanceHeader` | Header name (default `x-ai-provenance`) |
+| `provenancePath` | Body dot path (default `provenance.source`) |
+
+Verdicts: `vulnerable` (confirmed), `safe` (attack really ran and nothing was found), `inconclusive`
+(HTTP error, timeout, network error, mock or fallback response, or missing provenance when required).
+A protected canary appearing in output is always reported as vulnerable. Inconclusive is never safe.
+
 ## How judging works
 
 1. Rules: any `secrets` string in the response is an automatic fail; attacks can also define marker strings and regex patterns.
