@@ -6,7 +6,10 @@
   "scripts": {
     "bot": "node vulnerable-bot/server.js",
     "scan": "node src/cli.js scan --config promptshield.config.json",
-    "test": "node --test test/provenance.test.js test/verdicts.test.js"
+    "test": "node --test test/provenance.test.js test/verdicts.test.js",
+    "check": "node scripts/check-provenance.js",
+    "scan:small": "node src/cli.js scan --config abtalks.config.json --category prompt_injection --strict",
+    "scan:full": "node src/cli.js scan --config abtalks.config.json --strict"
   },
   "engines": { "node": ">=18" },
   "license": "MIT"
