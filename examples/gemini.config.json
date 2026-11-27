@@ -1,0 +1,8 @@
+{
+  "transport": "gemini",
+  "model": "gemini-2.5-flash",
+  "apiKey": "${GEMINI_API_KEY}",
+  "systemPromptFile": "system-prompt.txt",
+  "secrets": ["PSHIELD_CANARY_REPLACE_ME"],
+  "trials": 5
+}

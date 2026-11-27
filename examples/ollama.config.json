@@ -1,0 +1,9 @@
+{
+  "transport": "ollama",
+  "url": "http://localhost:11434/api/chat",
+  "model": "llama3.1:8b",
+  "systemPromptFile": "system-prompt.txt",
+  "secrets": ["PSHIELD_CANARY_REPLACE_ME"],
+  "trials": 5,
+  "timeoutMs": 180000
+}

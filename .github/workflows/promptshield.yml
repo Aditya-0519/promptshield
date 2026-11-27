@@ -1,0 +1,65 @@
+# Starter CI workflow. Adapt the app-start step to your own chatbot.
+# Commit promptshield.config.example.json (or another non-secret config) and
+# keep credentials in GitHub Actions secrets, never in the config file.
+name: PromptShield
+on:
+  pull_request:
+    paths:
+      - 'prompts/**'
+      - 'src/**'
+      - 'promptshield.config.example.json'
+      - 'attacks/**'
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install project dependencies
+        run: npm install --ignore-scripts
+
+      - name: Run PromptShield tests
+        run: npm test
+
+      # IMPORTANT: Start your own test/staging chatbot here. For example:
+      # - run: npm ci
+      # - run: npm start > app.log 2>&1 &
+      # - run: for i in {1..30}; do curl -fsS http://127.0.0.1:3000/health && exit 0; sleep 2; done; exit 1
+      # Configure promptshield.config.example.json to target that app.
+
+      - name: Scan the configured chatbot
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          APP_TOKEN: ${{ secrets.APP_TOKEN }}
+        run: >-
+          node src/cli.js scan
+          --config promptshield.config.example.json
+          --trials 5
+          --threshold 0.2
+          --format html,json,sarif,junit
+          --i-own-this-target
+          --out reports
+
+      - name: Upload SARIF to GitHub code scanning
+        if: always() && hashFiles('reports/report.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: reports/report.sarif
+
+      - name: Upload PromptShield reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptshield-report
+          path: reports/
+          if-no-files-found: ignore

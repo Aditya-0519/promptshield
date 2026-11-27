@@ -1,0 +1,8 @@
+{
+  "_help": "For apps whose API takes the whole conversation on every request. {{messages}} is replaced with the replayed history.",
+  "url": "https://your-app.example.com/api/chat",
+  "headers": { "Content-Type": "application/json", "Authorization": "Bearer ${MY_APP_TOKEN}" },
+  "bodyTemplate": { "messages": "{{messages}}" },
+  "responsePath": "choices.0.message.content",
+  "secrets": ["PSHIELD_CANARY_REPLACE_ME"]
+}

@@ -1,0 +1,20 @@
+{
+  "_help": "Copy this file to promptshield.config.json and customize it for an application you own. Keep credentials in environment variables.",
+  "transport": "http",
+  "url": "http://127.0.0.1:3000/chat",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer ${APP_TOKEN:-}"
+  },
+  "bodyTemplate": {
+    "message": "{{prompt}}",
+    "sessionId": "{{sessionId}}"
+  },
+  "responsePath": "reply",
+  "secrets": ["PSHIELD_CANARY_REPLACE_WITH_YOUR_OWN_RANDOM_VALUE"],
+  "trials": 5,
+  "concurrency": 1,
+  "timeoutMs": 30000,
+  "retries": 2
+}

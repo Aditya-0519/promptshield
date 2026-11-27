@@ -1,16 +1,48 @@
 {
   "name": "promptshield",
-  "version": "0.1.0",
-  "description": "Open-source security scanner for LLM-powered apps: tests chatbots and agents for prompt injection, system prompt leaks and data leaks.",
-  "bin": { "promptshield": "src/cli.js" },
+  "version": "0.2.2",
+  "description": "Leak and prompt-injection testing for chatbots and LLM apps, from your terminal or CI. Works with any HTTP API, OpenAI-compatible endpoints, Anthropic, Gemini and Ollama.",
+  "bin": {
+    "promptshield": "src/cli.js"
+  },
+  "files": [
+  "src",
+  "attacks/*.json",
+  "examples",
+  "vulnerable-bot",
+  "docs",
+  "README.md",
+  "LICENSE",
+  "SECURITY.md",
+  "CHANGELOG.md",
+  "UPGRADE.md",
+  "promptshield.config.example.json"
+],
   "scripts": {
     "bot": "node vulnerable-bot/server.js",
-    "scan": "node src/cli.js scan --config promptshield.config.json",
-    "test": "node --test test/provenance.test.js test/verdicts.test.js",
-    "check": "node scripts/check-provenance.js",
-    "scan:small": "node src/cli.js scan --config abtalks.config.json --category prompt_injection --strict",
-    "scan:full": "node src/cli.js scan --config abtalks.config.json --strict"
+    "scan": "node src/cli.js scan --config examples/vulnerable-bot.config.json",
+    "test": "node --test test/*.test.js",
+    "check": "node --check src/cli.js && node --check src/scanner.js && npm test"
   },
-  "engines": { "node": ">=18" },
-  "license": "MIT"
+  "keywords": [
+    "llm",
+    "security",
+    "prompt-injection",
+    "red-team",
+    "chatbot",
+    "ci",
+    "sarif"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aditya-0519/promptshield.git"
+  },
+  "homepage": "https://github.com/Aditya-0519/promptshield#readme",
+  "bugs": {
+    "url": "https://github.com/Aditya-0519/promptshield/issues"
+  }
 }

@@ -1,0 +1,10 @@
+{
+  "transport": "openai",
+  "url": "https://api.openai.com/v1/chat/completions",
+  "model": "gpt-4o-mini",
+  "apiKey": "${OPENAI_API_KEY}",
+  "systemPromptFile": "system-prompt.txt",
+  "secrets": ["PSHIELD_CANARY_REPLACE_ME"],
+  "trials": 5,
+  "concurrency": 2
+}
