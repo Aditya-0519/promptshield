@@ -1,0 +1,8 @@
+{
+  "transport": "anthropic",
+  "model": "claude-haiku-4-5",
+  "apiKey": "${ANTHROPIC_API_KEY}",
+  "systemPromptFile": "system-prompt.txt",
+  "secrets": ["PSHIELD_CANARY_REPLACE_ME"],
+  "trials": 5
+}
